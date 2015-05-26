@@ -19,7 +19,7 @@ add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 
 function wc_product_acf_location_rule_types($choices) {
     if(class_exists('acf') && class_exists('WooCommerce')) {
 	    $choices[__("Woocommerce")] = array(
-	    	'woocommerce_product_type'		=> __("Product Type", 'acf')
+	    	'woocommerce_product_type' => __("Product Type", 'acf')
 	    );
 	}
  
@@ -44,37 +44,31 @@ function rule_match_woocommerce_product_type($match, $rule, $options) {
 	if(class_exists('acf') && class_exists('WooCommerce')) {
 		$post_type = $options['post_type'];
 
-		if( !$post_type )
-		{
-			if( !$options['post_id'] )
-			{
+		if(!$post_type) {
+			if(!$options['post_id']) {
 				return false;
 			}
 			
-			$post_type = get_post_type( $options['post_id'] );
+			$post_type = get_post_type($options['post_id']);
 		}
 		
-		if( $post_type != 'product' ) {
+		if( $post_type != 'product') {
 			return false;
 		}		
 
-		
+		// Get Woocommerce product
 		$wc_product = new WC_Product($options['post_id']);
 		$wc_product_factory = new WC_Product_Factory();
-
 		$wc_product = $wc_product_factory->get_product($wc_product);
 
-
-		if( $rule['operator'] == "==" )
-	    {
-	    	$match = ( $wc_product->product_type === $rule['value'] );
-	    }
-	    elseif( $rule['operator'] == "!=" )
-	    {
-	    	$match = ( $wc_product->product_type !== $rule['value'] );
-	    }
+		if($rule['operator'] == "==") {
+			$match = ( $wc_product->product_type === $rule['value'] );
+		}
+		elseif($rule['operator'] == "!=") {
+			$match = ( $wc_product->product_type !== $rule['value'] );
+		}
     }
-    
+
 	return $match;
 }
 
