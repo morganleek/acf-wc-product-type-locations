@@ -1,10 +1,10 @@
 <?php
 
 /*
-Plugin Name: Advanced Custom Fields: Woocommerce Product Type Locations
+Plugin Name: Advanced Custom Fields: Woocommerce Product Type Locations (Pere Noel)
 Plugin URI: http://morganleek.me/
-Description: An add-on allows you to speicify ACF locations based on Woocommerce product types.
-Version: 1.0
+Description: An add-on allows you to speicify ACF locations based on Woocommerce product types. Code named 'Pere Noel'
+Version: 1.0.1
 Author: Morgan Leek
 Author URI: http://morganleek.me/
 License: GPL
@@ -12,6 +12,23 @@ Copyright: Morgan Leek
 */
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+// Enque JS
+add_action('acf/input/admin_enqueue_scripts', 'acf_wc_input_admin_enqueue_scripts', 10);
+
+function acf_wc_input_admin_enqueue_scripts() {
+	$settings = array(
+		'path' => apply_filters('acf/helpers/get_path', __FILE__),
+		'dir' => apply_filters('acf/helpers/get_dir', __FILE__),
+		'version' => '1.0.1'
+	);
+	
+	// register acf scripts
+	wp_register_script( 'acf-wc-input-product-type-locations', $settings['dir'] . 'js/input.js', array('acf-input'), $settings['version'] );
+	
+	// scripts
+	wp_enqueue_script(array('acf-wc-input-product-type-locations'));		
+}
 
 // Left most location rule
 add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 1);
@@ -71,5 +88,6 @@ function rule_match_woocommerce_product_type($match, $rule, $options) {
 
 	return $match;
 }
+
 
 ?>
