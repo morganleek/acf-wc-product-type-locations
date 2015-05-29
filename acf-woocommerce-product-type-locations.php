@@ -59,13 +59,6 @@ add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_wooco
 // Rule match tester for when the post edit page is loaded
 function rule_match_woocommerce_product_type($match, $rule, $options) {
 	if(class_exists('acf') && class_exists('WooCommerce')) {
-		/*return array(
-			'match' => $match,
-			'rule' => $rule,
-			'options' => $options
-		);*/
-
-
 		$post_type = $options['post_type'];
 
 		if(!$post_type) {
@@ -83,6 +76,7 @@ function rule_match_woocommerce_product_type($match, $rule, $options) {
 		// Get Woocommerce product
 		$product_type = "";
 		if(array_key_exists('woocommerce_product_type', $options)) {
+			// This can likely be streamlined
 			$product_type = $options['woocommerce_product_type'];
 		}
 		else {
