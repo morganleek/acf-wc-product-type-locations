@@ -13,10 +13,6 @@ Copyright: Morgan Leek
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-// if(is_admin()) {
-//	$active_plugins = apply_filters('active_plugins', get_option('active_plugins'));
-
-//	if(in_array('advanced-custom-fields/acf.php', $active_plugins) && in_array('woocommerce/woocommerce.php', $active_plugins)) {
 // Custom Actions
 add_action('acf/input/admin_enqueue_scripts', 'acf_wc_input_admin_enqueue_scripts', 10); // Enque JS
 // Custom Filters
@@ -25,8 +21,6 @@ add_filter('acf/location/rule_values/woocommerce_product_type', 'wc_product_acf_
 add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_woocommerce_product_type', 50, 3); // Rule match tester for when the post edit page is loaded
 
 // add_filter('acf/parse_types', 'wc_acf_location_parse_types', 
-//	}
-// }
 
 function acf_wc_input_admin_enqueue_scripts() {
 	$settings = array(
