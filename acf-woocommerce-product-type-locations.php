@@ -20,7 +20,24 @@ add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 
 add_filter('acf/location/rule_values/woocommerce_product_type', 'wc_product_acf_location_rule_types_woocommerce_product_type', 50, 1); // Right most ajax loaded location rule
 add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_woocommerce_product_type', 50, 3); // Rule match tester for when the post edit page is loaded
 
-// add_filter('acf/parse_types', 'wc_acf_location_parse_types', 
+
+add_filter('acf/parse_types', 'wc_acf_location_parse_types', 1, 1);
+
+function wc_acf_location_parse_types( $value ) {
+	if(is_array($value) && !empty($value)) {
+		if(!array_key_exists('woocommerce_product_type', $value) && array_key_exists('post_id',	$value)) {
+			// Add current Product Type if one hasn't been set
+			$wc_product = new WC_Product($value['post_id']);
+			$wc_product_factory = new WC_Product_Factory();
+			$wc_product = $wc_product_factory->get_product($wc_product);
+
+			$value['woocommerce_product_type'] = $wc_product->product_type;
+		}
+	}
+	
+	return $value;
+}
+
 
 function acf_wc_input_admin_enqueue_scripts() {
 	$settings = array(
@@ -61,29 +78,22 @@ function rule_match_woocommerce_product_type($match, $rule, $options) {
 		
 		$post_type = get_post_type($options['post_id']);
 	}
-	
+
+	// Ensure is a product
 	if( $post_type != 'product') {
 		return false;
 	}		
 
-	// Get Woocommerce product
-	$product_type = "";
-	if(array_key_exists('woocommerce_product_type', $options)) {
-		// This can likely be streamlined
-		$product_type = $options['woocommerce_product_type'];
+	// Ensure Product Type has been set
+	if(!array_key_exists('woocommerce_product_type', $options)) {
+		return false;
 	}
-	else {
-		$wc_product = new WC_Product($options['post_id']);
-		$wc_product_factory = new WC_Product_Factory();
-		$wc_product = $wc_product_factory->get_product($wc_product);
-		$product_type = $wc_product->product_type;
-	}
-
+	
 	if($rule['operator'] == "==") {
-		$match = ( $product_type === $rule['value'] );
+		$match = ( $options['woocommerce_product_type'] === $rule['value'] );
 	}
 	elseif($rule['operator'] == "!=") {
-		$match = ( $product_type !== $rule['value'] );
+		$match = ( $options['woocommerce_product_type'] !== $rule['value'] );
 	}
 
 	return $match;
