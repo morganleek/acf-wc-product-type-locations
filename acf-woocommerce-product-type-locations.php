@@ -15,23 +15,40 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 // Custom Actions
 add_action('acf/input/admin_enqueue_scripts', 'acf_wc_input_admin_enqueue_scripts', 10); // Enque JS
-// Custom Filters
-add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 1); // Left most location rule
-add_filter('acf/location/rule_values/woocommerce_product_type', 'wc_product_acf_location_rule_types_woocommerce_product_type', 50, 1); // Right most ajax loaded location rule
-add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_woocommerce_product_type', 50, 3); // Rule match tester for when the post edit page is loaded
 
+/* 
+** Custom Filters
+*/
+
+// Left most location rule
+add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 1); 
+
+// Right rules
+add_filter('acf/location/rule_values/woocommerce_product_type', 'wc_product_acf_location_rule_types_woocommerce_product_type', 50, 1);
+add_filter('acf/location/rule_values/woocommerce_variations', 'wc_product_acf_location_rule_types_woocommerce_variations', 50, 1);
+
+// Rule Validation
+add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_woocommerce_product_type', 50, 3); // Rule match tester for when the post edit page is loaded
+add_filter('acf/location/rule_match/woocommerce_variations', 'rule_match_woocommerce_variations', 50, 3);
 
 add_filter('acf/parse_types', 'wc_acf_location_parse_types', 1, 1);
 
 function wc_acf_location_parse_types( $value ) {
 	if(is_array($value) && !empty($value)) {
 		if(!array_key_exists('woocommerce_product_type', $value) && array_key_exists('post_id',	$value)) {
-			// Add current Product Type if one hasn't been set
-			$wc_product = new WC_Product($value['post_id']);
-			$wc_product_factory = new WC_Product_Factory();
-			$wc_product = $wc_product_factory->get_product($wc_product);
+			// Get Product
+			$product = wc_get_product($value['post_id']);
+			// Woocommerce Product Variables
+			$value['woocommerce_product_type'] = $product->product_type;
+			$value['woocommerce_is_in_stock'] = $product->stock_status;
+			$value['woocommerce_is_downloadable'] = $product->is_downloadable();
+			$value['woocommerce_is_virtual'] = $product->is_virtual();
+			$value['woocommerce_is_sold_individually'] = $product->is_sold_individually();
 
-			$value['woocommerce_product_type'] = $wc_product->product_type;
+			// print '<pre>' . print_r($value, true) . '</pre>';
+			// print '<pre>' . print_r($wc_product, true) . '</pre>'; 
+			// print '<pre>' . print_r($wc_product_factory->get_product_object($wc_product), true) . '</pre>'; 
+			// print '<pre>' . print_r($wc_product_factory->is_downloadable(), true) . '</pre>'; 
 		}
 	}
 	
@@ -43,7 +60,7 @@ function acf_wc_input_admin_enqueue_scripts() {
 	$settings = array(
 		'path' => apply_filters('acf/helpers/get_path', __FILE__),
 		'dir' => apply_filters('acf/helpers/get_dir', __FILE__),
-		'version' => '1.0.1'
+		'version' => '1.0.2'
 	);
 	
 	// register acf scripts
@@ -55,7 +72,8 @@ function acf_wc_input_admin_enqueue_scripts() {
 
 function wc_product_acf_location_rule_types($choices) {    
     $choices[__("Woocommerce")] = array(
-    	'woocommerce_product_type' => __("Product Type", 'acf')
+    	'woocommerce_product_type' => __("Product Type", 'acf'),
+    	'woocommerce_variations' => __("Product Variations", 'acf')
     );
 
     return $choices;
@@ -64,6 +82,17 @@ function wc_product_acf_location_rule_types($choices) {
 function wc_product_acf_location_rule_types_woocommerce_product_type($choices) {
 	$choices = wc_get_product_types();
 	
+	return $choices;
+}
+
+function wc_product_acf_location_rule_types_woocommerce_variations($choices) {
+	$choices = array(
+		// 'is_in_stock'        => 'In Stock',
+		'is_downloadable'     	=> 'Downloadable',
+		'is_virtual'          	=> 'Virtual',
+		'is_sold_individually'	=> 'Sold Individually'
+	);
+
 	return $choices;
 }
 
@@ -94,6 +123,38 @@ function rule_match_woocommerce_product_type($match, $rule, $options) {
 	}
 	elseif($rule['operator'] == "!=") {
 		$match = ( $options['woocommerce_product_type'] !== $rule['value'] );
+	}
+
+	return $match;
+}
+
+function rule_match_woocommerce_variations($match, $rule, $options) {
+	$post_type = $options['post_type'];
+
+	if(!$post_type) {
+		if(!$options['post_id']) {
+			return false;
+		}
+		
+		$post_type = get_post_type($options['post_id']);
+	}
+
+	// Ensure is a product
+	if( $post_type != 'product') {
+		return false;
+	}
+
+	if(!array_key_exists('woocommerce_is_virtual', $options) && !array_key_exists('value', $rule)) {
+		return false;
+	}
+
+	$key = 'woocommerce_' . $rule['value'];
+
+	if($rule['operator'] == "==") {
+		$match = ( $options[$key] === 1 );
+	}
+	elseif($rule['operator'] == "!=") {
+		$match = ( $options[$key] !== 1 );
 	}
 
 	return $match;

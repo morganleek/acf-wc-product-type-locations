@@ -1,4 +1,11 @@
 # acf-wc-product-type-locations
 ACF: Woocommerce Product Type Locations
 
-This plugin aims to allow the speicification of locations using Woocommerce's product types in the Wordpress plugin Advanced Custom Fields (ACF). This plugin requires both Woocommerce and Advanced Custom Fields to be installed on your Wordpress website.
+This plugin allows for the creation of location rules in Advanced Custom Fields (ACF) specific to Woocommerce post attributes in the Wordpress content management system. The current attributes supported for location rules are,
+
+*Product Types (Simple, Grouped, External, Variable)
+*Product Variations (Downloadable, Virtual, Sold Individually)
+
+The plugin will continue to expand over time adding addtional Woocommerce specific attributes to use in ACF rules. Feel free to request additional attributes as an enhancement in the Issues area on the Git.
+
+This plugin requires both Woocommerce and Advanced Custom Fields to be installed on your Wordpress website.
