@@ -29,16 +29,19 @@ add_filter('acf/location/rule_match/woocommerce_taxation', 'rule_match_woocommer
 
 add_filter('acf/parse_types', 'wc_acf_location_parse_types', 1, 1);
 
+// Position Rules
+add_action('acf/create_field', 'wc_product_acf_location_rule_types_create_field', 4, 1);
+
 function wc_acf_location_parse_types( $value ) {
 	if(is_array($value) && !empty($value)) {
-		if(!array_key_exists('woocommerce_product_type', $value) && array_key_exists('post_id',	$value)) {
+		if(!array_key_exists('woocommerce_product_type', $value) && array_key_exists('post_id',	$value) && array_key_exists('post_type', $value) && $value['post_type'] == "product") {
 			// Get Product
 			$product = wc_get_product($value['post_id']);
-
+		
 			// Woocommerce Product Variables
 			$value['woocommerce_product_type'] = $product->product_type;
 			$value['woocommerce_is_in_stock'] = $product->stock_status;
-			$value['woocommerce_is_downloadable'] = $product->is_downloadable();
+			$value['woocommerce_is_downloadable'] = $product->is_downloadable(); // $value['woocommerce_is_downloadable'] = (method_exists($product, 'is_downloadable')) ? $product->is_downloadable() : false;
 			$value['woocommerce_is_virtual'] = $product->is_virtual();
 			$value['woocommerce_is_sold_individually'] = $product->is_sold_individually();
 			// $value['woocommerce_needs_shipping'] = $product->needs_shipping();
@@ -165,6 +168,15 @@ function rule_match_woocommerce_bools($match, $rule, $options) {
 	}
 
 	return $match;
+}
+
+function wc_product_acf_location_rule_types_create_field($fields) {
+	$fields['choices']['woocommerce_products_general_tab'] = __('Woocommerce Products General Tab', 'acf');
+	if($fields['name'] == 'options[position]') {
+		_d($fields);
+	}
+
+	return $fields;
 }
 
 ?>
