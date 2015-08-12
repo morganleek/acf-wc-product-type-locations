@@ -33,7 +33,7 @@ add_filter('acf/parse_types', 'wc_acf_location_parse_types', 1, 1);
 add_action('acf/create_field', 'wc_product_acf_location_rule_types_create_field', 4, 1);
 
 function wc_acf_location_parse_types( $value ) {
-	if(is_array($value) && !empty($value)) {
+	if(is_array($value) && !empty($value) && isset($value['post_id']) && $value['post_id'] != 0) {
 		if(!array_key_exists('woocommerce_product_type', $value) && array_key_exists('post_id',	$value) && array_key_exists('post_type', $value) && $value['post_type'] == "product") {
 			// Get Product
 			$product = wc_get_product($value['post_id']);
