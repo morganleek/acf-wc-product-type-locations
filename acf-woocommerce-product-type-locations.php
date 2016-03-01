@@ -172,9 +172,9 @@ function rule_match_woocommerce_bools($match, $rule, $options) {
 
 function wc_product_acf_location_rule_types_create_field($fields) {
 	$fields['choices']['woocommerce_products_general_tab'] = __('Woocommerce Products General Tab', 'acf');
-	if($fields['name'] == 'options[position]') {
-		_d($fields);
-	}
+	// if($fields['name'] == 'options[position]') {
+	// 	_d($fields);
+	// }
 
 	return $fields;
 }
