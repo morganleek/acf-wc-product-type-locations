@@ -4,7 +4,7 @@
 Plugin Name: Advanced Custom Fields: Woocommerce Location Rules
 Plugin URI: https://github.com/morganleek/acf-wc-product-type-locations
 Description: An add-on allows you to speicify ACF location rules based on Woocommerce attributes.
-Version: 1.0.4
+Version: 1.0.5
 Author: Morgan Leek
 Author URI: http://morganleek.me/
 License: GPL
