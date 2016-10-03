@@ -21,11 +21,13 @@ add_filter('acf/location/rule_types', 'wc_product_acf_location_rule_types', 50, 
 add_filter('acf/location/rule_values/woocommerce_product_type', 'wc_product_acf_location_rule_types_woocommerce_product_type', 50, 1);
 add_filter('acf/location/rule_values/woocommerce_variations', 'wc_product_acf_location_rule_types_woocommerce_variations', 50, 1);
 add_filter('acf/location/rule_values/woocommerce_taxation', 'wc_product_acf_location_rule_types_woocommerce_taxation', 50, 1);
+add_filter('acf/location/rule_values/woocommerce_reviews_enabled', 'wc_product_acf_location_rule_types_woocommerce_reviews_enabled', 50, 1);
 
 // Rule Validation
 add_filter('acf/location/rule_match/woocommerce_product_type', 'rule_match_woocommerce_product_type', 50, 3); // Rule match tester for when the post edit page is loaded
 add_filter('acf/location/rule_match/woocommerce_variations', 'rule_match_woocommerce_bools', 50, 3);
 add_filter('acf/location/rule_match/woocommerce_taxation', 'rule_match_woocommerce_bools', 50, 3);
+add_filter('acf/location/rule_match/woocommerce_reviews_enabled', 'rule_match_woocommerce_bools', 50, 3);
 
 add_filter('acf/parse_types', 'wc_acf_location_parse_types', 1, 1);
 
@@ -48,13 +50,13 @@ function wc_acf_location_parse_types( $value ) {
 			$value['woocommerce_is_taxable'] = $product->is_taxable();
 			$value['woocommerce_is_shipping_taxable'] = $product->is_shipping_taxable();
 
-			// _d($value);
+			// Reviews Enabled
+			$value['woocommerce_reviews_enabled'] = (comments_open($value['post_id'])) ? 1 : 0;
 		}
 	}
 	
 	return $value;
 }
-
 
 function acf_wc_input_admin_enqueue_scripts() {
 	$settings = array(
@@ -74,7 +76,8 @@ function wc_product_acf_location_rule_types($choices) {
     $choices[__("Woocommerce")] = array(
     	'woocommerce_product_type' => __("Product Type", 'acf'),
     	'woocommerce_variations' => __("Product Variations", 'acf'),
-    	'woocommerce_taxation' => __("Product Taxation", 'acf')
+    	'woocommerce_taxation' => __("Product Taxation", 'acf'),
+    	'woocommerce_reviews_enabled' => __("Product Reviews Enabled", 'acf')
     );
 
     return $choices;
@@ -103,6 +106,13 @@ function wc_product_acf_location_rule_types_woocommerce_taxation($choises) {
 		'is_shipping_taxable'	=> 'Is Shipping Taxable'
 	);
 
+	return $choices;
+}
+
+function wc_product_acf_location_rule_types_woocommerce_reviews_enabled($choices) {
+	$choices = array(
+		'is_reviewable'			=> 'Is Reviewable'
+	);
 	return $choices;
 }
 

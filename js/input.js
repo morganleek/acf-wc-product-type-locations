@@ -24,13 +24,15 @@
 		woocommerce_is_virtual				:   0,
 		woocommerce_is_sold_individually	:   0,
 		woocommerce_is_taxable				: 	0,
-		woocommerce_is_shipping_taxable	 	:  	0
+		woocommerce_is_shipping_taxable	 	:  	0,
+		woocommerce_is_reviewable	: 0
 	};
 
 	$(document).ready(function(){
 		acf.screen.woocommerce_is_virtual = ($('#_virtual').is(':checked')) ? 1 : 0;
 		acf.screen.woocommerce_is_downloadable = ($('#_downloadable').is(':checked')) ? 1 : 0;
 		acf.screen.woocommerce_sold_individually = ($('#_sold_individually').is(':checked')) ? 1 : 0;
+		acf.screen.woocommerce_is_reviewable = ($('#comment_status').is(':checked')) ? 1 : 0;
 		taxable_status();
 	});
 
@@ -46,6 +48,12 @@
 
 	$(document).on('change', '#_tax_status', function() {
 		taxable_status();
+		$(document).trigger('acf/update_field_groups');
+	});
+
+	// Reviews Checkbox
+	$(document).on('change', '#comment_status', function() {
+		acf.screen.woocommerce_is_reviewable = ($(this).is(':checked')) ? 1 : 0;
 		$(document).trigger('acf/update_field_groups');
 	});
 
