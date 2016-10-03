@@ -6,6 +6,7 @@ This plugin allows for the creation of location rules in Advanced Custom Fields 
 *	Product Types (Simple, Grouped, External, Variable)
 *	Product Variations (Downloadable, Virtual, Sold Individually)
 *	Product Taxation (Product Taxable, Shipping Taxable)
+* Product Reviewable
 
 The plugin will continue to expand over time adding addtional Woocommerce specific attributes to use in ACF rules. Feel free to request additional attributes as an enhancement in the Issues area on the Git.
 
