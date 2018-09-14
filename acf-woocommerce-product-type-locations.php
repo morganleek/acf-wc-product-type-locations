@@ -29,7 +29,7 @@ add_filter('acf/location/rule_match/woocommerce_variations', 'rule_match_woocomm
 add_filter('acf/location/rule_match/woocommerce_taxation', 'rule_match_woocommerce_bools', 50, 3);
 add_filter('acf/location/rule_match/woocommerce_reviews_enabled', 'rule_match_woocommerce_bools', 50, 3);
 
-add_filter('acf/parse_types', 'wc_acf_location_parse_types', 1, 1);
+add_filter('acf/location/screen', 'wc_acf_location_parse_types', 1, 1);
 
 // Position Rules
 add_action('acf/create_field', 'wc_product_acf_location_rule_types_create_field', 4, 1);
@@ -41,8 +41,8 @@ function wc_acf_location_parse_types( $value ) {
 			$product = wc_get_product($value['post_id']);
 		
 			// Woocommerce Product Variables
-			$value['woocommerce_product_type'] = $product->product_type;
-			$value['woocommerce_is_in_stock'] = $product->stock_status;
+			$value['woocommerce_product_type'] = $product->get_type();
+			$value['woocommerce_is_in_stock'] = $product->get_stock_status();
 			$value['woocommerce_is_downloadable'] = $product->is_downloadable(); // $value['woocommerce_is_downloadable'] = (method_exists($product, 'is_downloadable')) ? $product->is_downloadable() : false;
 			$value['woocommerce_is_virtual'] = $product->is_virtual();
 			$value['woocommerce_is_sold_individually'] = $product->is_sold_individually();
@@ -59,17 +59,18 @@ function wc_acf_location_parse_types( $value ) {
 }
 
 function acf_wc_input_admin_enqueue_scripts() {
+
 	$settings = array(
-		'path' => apply_filters('acf/helpers/get_path', __FILE__),
-		'dir' => apply_filters('acf/helpers/get_dir', __FILE__),
+		'path' => plugins_url(basename(__DIR__)),
+		'dir' => apply_filters('acf/helpers/get_dir', __DIR__),
 		'version' => '1.0.3'
 	);
-	
+
 	// register acf scripts
-	wp_register_script( 'acf-wc-input-product-type-locations', $settings['dir'] . 'js/input.js', array('acf-input'), $settings['version'] );
+	wp_register_script( 'acf-wc-input-product-type-locations', $settings['path'] . '/js/input.js', array('acf-input'), $settings['version'] );
 	
 	// scripts
-	wp_enqueue_script(array('acf-wc-input-product-type-locations'));		
+	wp_enqueue_script('acf-wc-input-product-type-locations');
 }
 
 function wc_product_acf_location_rule_types($choices) {    
@@ -85,7 +86,6 @@ function wc_product_acf_location_rule_types($choices) {
 
 function wc_product_acf_location_rule_types_woocommerce_product_type($choices) {
 	$choices = wc_get_product_types();
-	
 	return $choices;
 }
 
@@ -131,13 +131,13 @@ function rule_match_woocommerce_product_type($match, $rule, $options) {
 	// Ensure is a product
 	if( $post_type != 'product') {
 		return false;
-	}		
+	}
 
 	// Ensure Product Type has been set
 	if(!array_key_exists('woocommerce_product_type', $options)) {
 		return false;
 	}
-	
+
 	if($rule['operator'] == "==") {
 		$match = ( $options['woocommerce_product_type'] === $rule['value'] );
 	}
@@ -189,4 +189,3 @@ function wc_product_acf_location_rule_types_create_field($fields) {
 	return $fields;
 }
 
-?>
